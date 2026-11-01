@@ -31,66 +31,47 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-brand">
-          <div className="auth-brand-icon">
-            <TrendingUp size={18} color="#fff" />
-          </div>
-          <span className="auth-brand-name">Expense Tracker</span>
+      <div className="auth-left">
+        <div className="auth-left-logo">
+          <div className="auth-left-logo-icon"><TrendingUp size={18} color="#fff" /></div>
+          <span className="auth-left-logo-text">ExpenseTracker</span>
         </div>
-
-        <h1 className="auth-title">Create account</h1>
-        <p className="auth-subtitle">Start tracking your finances today</p>
-
-        {error && <div className="alert-error">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Full name</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-input"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-input"
-              placeholder="Min. 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 4 }} disabled={loading}>
-            <UserPlus size={16} />
-            {loading ? 'Creating account…' : 'Create account'}
-          </button>
-        </form>
-
-        <p className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
+        <h1 className="auth-left-title">Start your journey to financial clarity.</h1>
+        <p className="auth-left-sub">
+          Join thousands who've taken control of their money. Free to use, forever.
         </p>
+      </div>
+
+      <div className="auth-right">
+        <div className="auth-form-box">
+          <h2 className="auth-form-title">Create account</h2>
+          <p className="auth-form-sub">Set up your free account in seconds</p>
+
+          {error && <div className="alert-error">{error}</div>}
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">Full name</label>
+              <input type="text" className="form-input" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email address</label>
+              <input type="email" className="form-input" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <input type="password" className="form-input" placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 6 }} disabled={loading}>
+              <UserPlus size={15} />
+              {loading ? 'Creating account…' : 'Create account'}
+            </button>
+          </form>
+
+          <p className="auth-footer">
+            Already have an account? <Link to="/login">Sign in</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
