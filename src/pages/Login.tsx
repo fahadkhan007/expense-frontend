@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { TrendingUp, LogIn } from 'lucide-react';
 import { login } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,9 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: Location })?.from?.pathname ?? '/dashboard';
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -19,7 +22,7 @@ export default function Login() {
     try {
       const data = await login({ email, password });
       signIn(data.access_token, data.user);
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } }).response?.data?.detail;
       setError(msg ?? 'Invalid email or password.');

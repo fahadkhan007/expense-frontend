@@ -12,9 +12,12 @@ client.interceptors.response.use(
   (r) => r,
   (err) => {
     if (err.response?.status === 401) {
+      // Clear stored credentials
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Dispatch a custom event — App.tsx listens and does a React Router redirect.
+      // This avoids a hard page reload and keeps SPA navigation consistent.
+      window.dispatchEvent(new CustomEvent('auth:unauthorized'));
     }
     return Promise.reject(err);
   },
