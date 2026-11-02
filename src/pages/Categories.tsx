@@ -8,6 +8,58 @@ import Spinner from '../components/Spinner';
 const ICONS = ['🍔', '🚗', '🏠', '💊', '🎮', '✈️', '📚', '🛍️', '💡', '💰', '💼', '🎁', '☕', '🏋️', '🍕', '🎵', '⚡', '🌐'];
 const COLORS = ['#1CC29F', '#27AE60', '#E74C3C', '#F39C12', '#3498DB', '#9B59B6', '#E91E63', '#00BCD4', '#FF5722', '#607D8B'];
 
+interface FormBodyProps {
+  error: string;
+  name: string;
+  setName: (v: string) => void;
+  type: 'debit' | 'credit' | '';
+  setType: (v: 'debit' | 'credit' | '') => void;
+  icon: string;
+  setIcon: (v: string) => void;
+  color: string;
+  setColor: (v: string) => void;
+}
+
+function FormBody({ error, name, setName, type, setType, icon, setIcon, color, setColor }: FormBodyProps) {
+  return (
+    <>
+      {error && <div className="alert-error">{error}</div>}
+      <div className="form-group">
+        <label className="form-label">Name</label>
+        <input type="text" className="form-input" placeholder="e.g. Food & Dining" value={name} onChange={(e) => setName(e.target.value)} required maxLength={50} />
+      </div>
+      <div className="form-group">
+        <label className="form-label">Type</label>
+        <select className="form-select" value={type} onChange={(e) => setType(e.target.value as 'debit' | 'credit' | '')}>
+          <option value="">Any (both debit &amp; credit)</option>
+          <option value="debit">Expense (Debit only)</option>
+          <option value="credit">Income (Credit only)</option>
+        </select>
+      </div>
+      <div className="form-group">
+        <label className="form-label">Icon</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {ICONS.map((i) => (
+            <button key={i} type="button" onClick={() => setIcon(i)}
+              style={{ fontSize: 20, background: icon === i ? 'var(--teal-light)' : 'var(--bg)', border: `1.5px solid ${icon === i ? 'var(--teal)' : 'var(--border)'}`, borderRadius: 8, padding: '4px 7px', cursor: 'pointer', transition: 'all 0.1s' }}>
+              {i}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="form-group" style={{ marginBottom: 0 }}>
+        <label className="form-label">Color</label>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {COLORS.map((c) => (
+            <button key={c} type="button" onClick={() => setColor(c)}
+              style={{ width: 26, height: 26, borderRadius: '50%', background: c, border: `3px solid ${color === c ? 'var(--text)' : 'transparent'}`, cursor: 'pointer', transition: 'border 0.1s' }} />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,43 +111,7 @@ export default function Categories() {
     await deleteCategory(id); load();
   };
 
-  const FormBody = () => (
-    <>
-      {error && <div className="alert-error">{error}</div>}
-      <div className="form-group">
-        <label className="form-label">Name</label>
-        <input type="text" className="form-input" placeholder="e.g. Food & Dining" value={name} onChange={(e) => setName(e.target.value)} required maxLength={50} />
-      </div>
-      <div className="form-group">
-        <label className="form-label">Type</label>
-        <select className="form-select" value={type} onChange={(e) => setType(e.target.value as 'debit' | 'credit' | '')}>
-          <option value="">Any (both debit & credit)</option>
-          <option value="debit">Expense (Debit only)</option>
-          <option value="credit">Income (Credit only)</option>
-        </select>
-      </div>
-      <div className="form-group">
-        <label className="form-label">Icon</label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {ICONS.map((i) => (
-            <button key={i} type="button" onClick={() => setIcon(i)}
-              style={{ fontSize: 20, background: icon === i ? 'var(--teal-light)' : 'var(--bg)', border: `1.5px solid ${icon === i ? 'var(--teal)' : 'var(--border)'}`, borderRadius: 8, padding: '4px 7px', cursor: 'pointer', transition: 'all 0.1s' }}>
-              {i}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="form-group" style={{ marginBottom: 0 }}>
-        <label className="form-label">Color</label>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {COLORS.map((c) => (
-            <button key={c} type="button" onClick={() => setColor(c)}
-              style={{ width: 26, height: 26, borderRadius: '50%', background: c, border: `3px solid ${color === c ? 'var(--text)' : 'transparent'}`, cursor: 'pointer', transition: 'border 0.1s' }} />
-          ))}
-        </div>
-      </div>
-    </>
-  );
+  const formBodyProps = { error, name, setName, type, setType, icon, setIcon, color, setColor };
 
   return (
     <div>
@@ -136,14 +152,14 @@ export default function Categories() {
       {showCreate && (
         <Modal title="Add Category" onClose={() => setShowCreate(false)}
           footer={<><button className="btn btn-ghost" onClick={() => setShowCreate(false)}>Cancel</button><button className="btn btn-primary" onClick={handleCreate} disabled={saving}>{saving ? 'Saving…' : 'Create'}</button></>}>
-          <form onSubmit={handleCreate}><FormBody /></form>
+          <form onSubmit={handleCreate}><FormBody {...formBodyProps} /></form>
         </Modal>
       )}
 
       {editCat && (
         <Modal title={`Edit — ${editCat.name}`} onClose={() => setEditCat(null)}
           footer={<><button className="btn btn-ghost" onClick={() => setEditCat(null)}>Cancel</button><button className="btn btn-primary" onClick={handleUpdate} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button></>}>
-          <form onSubmit={handleUpdate}><FormBody /></form>
+          <form onSubmit={handleUpdate}><FormBody {...formBodyProps} /></form>
         </Modal>
       )}
     </div>
