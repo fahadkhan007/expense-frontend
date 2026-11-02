@@ -8,6 +8,55 @@ import Spinner from '../components/Spinner';
 
 const PAGE_SIZE = 20;
 
+interface FormBodyProps {
+  isEdit: boolean;
+  error: string;
+  type: 'debit' | 'credit';
+  setType: (t: 'debit' | 'credit') => void;
+  amount: string;
+  setAmount: (v: string) => void;
+  catId: string;
+  setCatId: (v: string) => void;
+  desc: string;
+  setDesc: (v: string) => void;
+  categories: Category[];
+  filteredCats: Category[];
+}
+
+function FormBody({ isEdit, error, type, setType, amount, setAmount, catId, setCatId, desc, setDesc, categories, filteredCats }: FormBodyProps) {
+  return (
+    <>
+      {error && <div className="alert-error">{error}</div>}
+      {!isEdit && (
+        <div className="form-group">
+          <label className="form-label">Type</label>
+          <select className="form-select" value={type} onChange={(e) => { setType(e.target.value as 'debit' | 'credit'); setCatId(''); }}>
+            <option value="debit">Expense (Debit)</option>
+            <option value="credit">Income (Credit)</option>
+          </select>
+        </div>
+      )}
+      <div className="form-group">
+        <label className="form-label">Amount ($)</label>
+        <input type="number" className="form-input" placeholder="0.00" min="0.01" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+      </div>
+      <div className="form-group">
+        <label className="form-label">Category</label>
+        <select className="form-select" value={catId} onChange={(e) => setCatId(e.target.value)}>
+          <option value="">Select category…</option>
+          {(isEdit ? categories : filteredCats).map((c) => (
+            <option key={c._id} value={c._id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
+          ))}
+        </select>
+      </div>
+      <div className="form-group" style={{ marginBottom: 0 }}>
+        <label className="form-label">Description (optional)</label>
+        <input type="text" className="form-input" placeholder="What was this for?" value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={300} />
+      </div>
+    </>
+  );
+}
+
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -84,37 +133,7 @@ export default function Transactions() {
     return c ? `${c.icon ?? ''} ${c.name}`.trim() : '—';
   };
 
-  const FormBody = ({ isEdit }: { isEdit: boolean }) => (
-    <>
-      {error && <div className="alert-error">{error}</div>}
-      {!isEdit && (
-        <div className="form-group">
-          <label className="form-label">Type</label>
-          <select className="form-select" value={type} onChange={(e) => { setType(e.target.value as 'debit' | 'credit'); setCatId(''); }}>
-            <option value="debit">Expense (Debit)</option>
-            <option value="credit">Income (Credit)</option>
-          </select>
-        </div>
-      )}
-      <div className="form-group">
-        <label className="form-label">Amount ($)</label>
-        <input type="number" className="form-input" placeholder="0.00" min="0.01" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-      </div>
-      <div className="form-group">
-        <label className="form-label">Category</label>
-        <select className="form-select" value={catId} onChange={(e) => setCatId(e.target.value)}>
-          <option value="">Select category…</option>
-          {(isEdit ? categories : filteredCats).map((c) => (
-            <option key={c._id} value={c._id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
-          ))}
-        </select>
-      </div>
-      <div className="form-group" style={{ marginBottom: 0 }}>
-        <label className="form-label">Description (optional)</label>
-        <input type="text" className="form-input" placeholder="What was this for?" value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={300} />
-      </div>
-    </>
-  );
+  const formBodyProps = { error, type, setType, amount, setAmount, catId, setCatId, desc, setDesc, categories, filteredCats };
 
   return (
     <div>
@@ -179,14 +198,14 @@ export default function Transactions() {
       {showCreate && (
         <Modal title="Add Transaction" onClose={() => setShowCreate(false)}
           footer={<><button className="btn btn-ghost" onClick={() => setShowCreate(false)}>Cancel</button><button className="btn btn-primary" onClick={handleCreate} disabled={saving}>{saving ? 'Saving…' : 'Add'}</button></>}>
-          <form onSubmit={handleCreate}><FormBody isEdit={false} /></form>
+          <form onSubmit={handleCreate}><FormBody isEdit={false} {...formBodyProps} /></form>
         </Modal>
       )}
 
       {editTxn && (
         <Modal title="Edit Transaction" onClose={() => setEditTxn(null)}
           footer={<><button className="btn btn-ghost" onClick={() => setEditTxn(null)}>Cancel</button><button className="btn btn-primary" onClick={handleUpdate} disabled={saving}>{saving ? 'Saving…' : 'Save'}</button></>}>
-          <form onSubmit={handleUpdate}><FormBody isEdit={true} /></form>
+          <form onSubmit={handleUpdate}><FormBody isEdit={true} {...formBodyProps} /></form>
         </Modal>
       )}
     </div>
